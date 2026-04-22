@@ -12,16 +12,22 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppRoadmapRouteImport } from './routes/_app.roadmap'
+import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppReleasesRouteImport } from './routes/_app.releases'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppProductsRouteImport } from './routes/_app.products'
 import { Route as AppPortfoliosRouteImport } from './routes/_app.portfolios'
 import { Route as AppMyWorkRouteImport } from './routes/_app.my-work'
 import { Route as AppInitiativesRouteImport } from './routes/_app.initiatives'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppStoriesIdRouteImport } from './routes/_app.stories.$id'
 import { Route as AppReleasesIdRouteImport } from './routes/_app.releases.$id'
 import { Route as AppProductsIdRouteImport } from './routes/_app.products.$id'
 import { Route as AppPortfoliosIdRouteImport } from './routes/_app.portfolios.$id'
 import { Route as AppInitiativesIdRouteImport } from './routes/_app.initiatives.$id'
+import { Route as AppEpicsIdRouteImport } from './routes/_app.epics.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -37,9 +43,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRoadmapRoute = AppRoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReleasesRoute = AppReleasesRouteImport.update({
   id: '/releases',
   path: '/releases',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProductsRoute = AppProductsRouteImport.update({
@@ -67,6 +93,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppStoriesIdRoute = AppStoriesIdRouteImport.update({
+  id: '/stories/$id',
+  path: '/stories/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReleasesIdRoute = AppReleasesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -87,6 +118,11 @@ const AppInitiativesIdRoute = AppInitiativesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppInitiativesRoute,
 } as any)
+const AppEpicsIdRoute = AppEpicsIdRouteImport.update({
+  id: '/epics/$id',
+  path: '/epics/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,11 +132,17 @@ export interface FileRoutesByFullPath {
   '/my-work': typeof AppMyWorkRoute
   '/portfolios': typeof AppPortfoliosRouteWithChildren
   '/products': typeof AppProductsRouteWithChildren
+  '/profile': typeof AppProfileRoute
   '/releases': typeof AppReleasesRouteWithChildren
+  '/reports': typeof AppReportsRoute
+  '/roadmap': typeof AppRoadmapRoute
+  '/settings': typeof AppSettingsRoute
+  '/epics/$id': typeof AppEpicsIdRoute
   '/initiatives/$id': typeof AppInitiativesIdRoute
   '/portfolios/$id': typeof AppPortfoliosIdRoute
   '/products/$id': typeof AppProductsIdRoute
   '/releases/$id': typeof AppReleasesIdRoute
+  '/stories/$id': typeof AppStoriesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,11 +152,17 @@ export interface FileRoutesByTo {
   '/my-work': typeof AppMyWorkRoute
   '/portfolios': typeof AppPortfoliosRouteWithChildren
   '/products': typeof AppProductsRouteWithChildren
+  '/profile': typeof AppProfileRoute
   '/releases': typeof AppReleasesRouteWithChildren
+  '/reports': typeof AppReportsRoute
+  '/roadmap': typeof AppRoadmapRoute
+  '/settings': typeof AppSettingsRoute
+  '/epics/$id': typeof AppEpicsIdRoute
   '/initiatives/$id': typeof AppInitiativesIdRoute
   '/portfolios/$id': typeof AppPortfoliosIdRoute
   '/products/$id': typeof AppProductsIdRoute
   '/releases/$id': typeof AppReleasesIdRoute
+  '/stories/$id': typeof AppStoriesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -126,11 +174,17 @@ export interface FileRoutesById {
   '/_app/my-work': typeof AppMyWorkRoute
   '/_app/portfolios': typeof AppPortfoliosRouteWithChildren
   '/_app/products': typeof AppProductsRouteWithChildren
+  '/_app/profile': typeof AppProfileRoute
   '/_app/releases': typeof AppReleasesRouteWithChildren
+  '/_app/reports': typeof AppReportsRoute
+  '/_app/roadmap': typeof AppRoadmapRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/epics/$id': typeof AppEpicsIdRoute
   '/_app/initiatives/$id': typeof AppInitiativesIdRoute
   '/_app/portfolios/$id': typeof AppPortfoliosIdRoute
   '/_app/products/$id': typeof AppProductsIdRoute
   '/_app/releases/$id': typeof AppReleasesIdRoute
+  '/_app/stories/$id': typeof AppStoriesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -142,11 +196,17 @@ export interface FileRouteTypes {
     | '/my-work'
     | '/portfolios'
     | '/products'
+    | '/profile'
     | '/releases'
+    | '/reports'
+    | '/roadmap'
+    | '/settings'
+    | '/epics/$id'
     | '/initiatives/$id'
     | '/portfolios/$id'
     | '/products/$id'
     | '/releases/$id'
+    | '/stories/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -156,11 +216,17 @@ export interface FileRouteTypes {
     | '/my-work'
     | '/portfolios'
     | '/products'
+    | '/profile'
     | '/releases'
+    | '/reports'
+    | '/roadmap'
+    | '/settings'
+    | '/epics/$id'
     | '/initiatives/$id'
     | '/portfolios/$id'
     | '/products/$id'
     | '/releases/$id'
+    | '/stories/$id'
   id:
     | '__root__'
     | '/'
@@ -171,11 +237,17 @@ export interface FileRouteTypes {
     | '/_app/my-work'
     | '/_app/portfolios'
     | '/_app/products'
+    | '/_app/profile'
     | '/_app/releases'
+    | '/_app/reports'
+    | '/_app/roadmap'
+    | '/_app/settings'
+    | '/_app/epics/$id'
     | '/_app/initiatives/$id'
     | '/_app/portfolios/$id'
     | '/_app/products/$id'
     | '/_app/releases/$id'
+    | '/_app/stories/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,11 +279,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/roadmap': {
+      id: '/_app/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof AppRoadmapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports': {
+      id: '/_app/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/releases': {
       id: '/_app/releases'
       path: '/releases'
       fullPath: '/releases'
       preLoaderRoute: typeof AppReleasesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/products': {
@@ -249,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/stories/$id': {
+      id: '/_app/stories/$id'
+      path: '/stories/$id'
+      fullPath: '/stories/$id'
+      preLoaderRoute: typeof AppStoriesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/releases/$id': {
       id: '/_app/releases/$id'
       path: '/$id'
@@ -276,6 +383,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/initiatives/$id'
       preLoaderRoute: typeof AppInitiativesIdRouteImport
       parentRoute: typeof AppInitiativesRoute
+    }
+    '/_app/epics/$id': {
+      id: '/_app/epics/$id'
+      path: '/epics/$id'
+      fullPath: '/epics/$id'
+      preLoaderRoute: typeof AppEpicsIdRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
@@ -334,7 +448,13 @@ interface AppRouteChildren {
   AppMyWorkRoute: typeof AppMyWorkRoute
   AppPortfoliosRoute: typeof AppPortfoliosRouteWithChildren
   AppProductsRoute: typeof AppProductsRouteWithChildren
+  AppProfileRoute: typeof AppProfileRoute
   AppReleasesRoute: typeof AppReleasesRouteWithChildren
+  AppReportsRoute: typeof AppReportsRoute
+  AppRoadmapRoute: typeof AppRoadmapRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppEpicsIdRoute: typeof AppEpicsIdRoute
+  AppStoriesIdRoute: typeof AppStoriesIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -343,7 +463,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppMyWorkRoute: AppMyWorkRoute,
   AppPortfoliosRoute: AppPortfoliosRouteWithChildren,
   AppProductsRoute: AppProductsRouteWithChildren,
+  AppProfileRoute: AppProfileRoute,
   AppReleasesRoute: AppReleasesRouteWithChildren,
+  AppReportsRoute: AppReportsRoute,
+  AppRoadmapRoute: AppRoadmapRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppEpicsIdRoute: AppEpicsIdRoute,
+  AppStoriesIdRoute: AppStoriesIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
