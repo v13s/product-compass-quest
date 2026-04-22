@@ -17,7 +17,13 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
-const NAV = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+};
+const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/my-work", label: "My Work", icon: ListTodo },
   { to: "/roadmap", label: "Roadmap", icon: Map },
@@ -26,7 +32,7 @@ const NAV = [
   { to: "/initiatives", label: "Initiatives", icon: Lightbulb },
   { to: "/releases", label: "Releases", icon: Tag },
   { to: "/reports", label: "Reports", icon: BarChart3 },
-] as const;
+];
 
 export function AppSidebar() {
   const { profile, user, signOut, canEdit, isAdmin } = useAuth();
