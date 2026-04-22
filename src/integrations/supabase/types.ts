@@ -14,16 +14,584 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          entity_id: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity_id: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      epics: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          initiative_id: string | null
+          name: string
+          owner_id: string | null
+          priority: Database["public"]["Enums"]["priority"]
+          product_id: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          initiative_id?: string | null
+          name: string
+          owner_id?: string | null
+          priority?: Database["public"]["Enums"]["priority"]
+          product_id?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          initiative_id?: string | null
+          name?: string
+          owner_id?: string | null
+          priority?: Database["public"]["Enums"]["priority"]
+          product_id?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epics_initiative_id_fkey"
+            columns: ["initiative_id"]
+            isOneToOne: false
+            referencedRelation: "initiatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      initiative_products: {
+        Row: {
+          initiative_id: string
+          product_id: string
+        }
+        Insert: {
+          initiative_id: string
+          product_id: string
+        }
+        Update: {
+          initiative_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "initiative_products_initiative_id_fkey"
+            columns: ["initiative_id"]
+            isOneToOne: false
+            referencedRelation: "initiatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initiative_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      initiative_types: {
+        Row: {
+          built_in: boolean
+          color: string | null
+          created_at: string
+          field_schema: Json
+          id: string
+          key: string
+          label: string
+        }
+        Insert: {
+          built_in?: boolean
+          color?: string | null
+          created_at?: string
+          field_schema?: Json
+          id?: string
+          key: string
+          label: string
+        }
+        Update: {
+          built_in?: boolean
+          color?: string | null
+          created_at?: string
+          field_schema?: Json
+          id?: string
+          key?: string
+          label?: string
+        }
+        Relationships: []
+      }
+      initiatives: {
+        Row: {
+          created_at: string
+          custom_fields: Json
+          description: string | null
+          id: string
+          name: string
+          owner_id: string | null
+          portfolio_id: string | null
+          priority: Database["public"]["Enums"]["priority"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          target_date: string | null
+          type_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_fields?: Json
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string | null
+          portfolio_id?: string | null
+          priority?: Database["public"]["Enums"]["priority"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          type_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_fields?: Json
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string | null
+          portfolio_id?: string | null
+          priority?: Database["public"]["Enums"]["priority"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          type_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "initiatives_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initiatives_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "initiative_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolios: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string | null
+          portfolio_id: string | null
+          priority: Database["public"]["Enums"]["priority"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string | null
+          portfolio_id?: string | null
+          priority?: Database["public"]["Enums"]["priority"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string | null
+          portfolio_id?: string | null
+          priority?: Database["public"]["Enums"]["priority"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          team: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          team?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          team?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      release_epics: {
+        Row: {
+          epic_id: string
+          release_id: string
+        }
+        Insert: {
+          epic_id: string
+          release_id: string
+        }
+        Update: {
+          epic_id?: string
+          release_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "release_epics_epic_id_fkey"
+            columns: ["epic_id"]
+            isOneToOne: false
+            referencedRelation: "epics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "release_epics_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      releases: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          product_id: string | null
+          released_at: string | null
+          status: Database["public"]["Enums"]["release_status"]
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          product_id?: string | null
+          released_at?: string | null
+          status?: Database["public"]["Enums"]["release_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          product_id?: string | null
+          released_at?: string | null
+          status?: Database["public"]["Enums"]["release_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "releases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stories: {
+        Row: {
+          assignee_id: string | null
+          created_at: string
+          description: string | null
+          epic_id: string | null
+          id: string
+          name: string
+          priority: Database["public"]["Enums"]["priority"]
+          release_id: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          epic_id?: string | null
+          id?: string
+          name: string
+          priority?: Database["public"]["Enums"]["priority"]
+          release_id?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          epic_id?: string | null
+          id?: string
+          name?: string
+          priority?: Database["public"]["Enums"]["priority"]
+          release_id?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_epic_id_fkey"
+            columns: ["epic_id"]
+            isOneToOne: false
+            referencedRelation: "epics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stories_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          assignee_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          priority: Database["public"]["Enums"]["priority"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          story_id: string | null
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          priority?: Database["public"]["Enums"]["priority"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          story_id?: string | null
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          priority?: Database["public"]["Enums"]["priority"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          story_id?: string | null
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin_or_pm: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "leader" | "pm" | "member"
+      priority: "p0" | "p1" | "p2" | "p3"
+      release_status: "planned" | "in_development" | "released" | "deprecated"
+      work_status:
+        | "draft"
+        | "planned"
+        | "in_progress"
+        | "in_review"
+        | "done"
+        | "released"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +718,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "leader", "pm", "member"],
+      priority: ["p0", "p1", "p2", "p3"],
+      release_status: ["planned", "in_development", "released", "deprecated"],
+      work_status: [
+        "draft",
+        "planned",
+        "in_progress",
+        "in_review",
+        "done",
+        "released",
+        "cancelled",
+      ],
+    },
   },
 } as const
