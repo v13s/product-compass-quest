@@ -12,10 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppReleasesRouteImport } from './routes/_app.releases'
+import { Route as AppProductsRouteImport } from './routes/_app.products'
 import { Route as AppPortfoliosRouteImport } from './routes/_app.portfolios'
 import { Route as AppMyWorkRouteImport } from './routes/_app.my-work'
+import { Route as AppInitiativesRouteImport } from './routes/_app.initiatives'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppReleasesIdRouteImport } from './routes/_app.releases.$id'
+import { Route as AppProductsIdRouteImport } from './routes/_app.products.$id'
 import { Route as AppPortfoliosIdRouteImport } from './routes/_app.portfolios.$id'
+import { Route as AppInitiativesIdRouteImport } from './routes/_app.initiatives.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -31,6 +37,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppReleasesRoute = AppReleasesRouteImport.update({
+  id: '/releases',
+  path: '/releases',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProductsRoute = AppProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPortfoliosRoute = AppPortfoliosRouteImport.update({
   id: '/portfolios',
   path: '/portfolios',
@@ -41,32 +57,64 @@ const AppMyWorkRoute = AppMyWorkRouteImport.update({
   path: '/my-work',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInitiativesRoute = AppInitiativesRouteImport.update({
+  id: '/initiatives',
+  path: '/initiatives',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AppRoute,
+} as any)
+const AppReleasesIdRoute = AppReleasesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppReleasesRoute,
+} as any)
+const AppProductsIdRoute = AppProductsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppProductsRoute,
 } as any)
 const AppPortfoliosIdRoute = AppPortfoliosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => AppPortfoliosRoute,
 } as any)
+const AppInitiativesIdRoute = AppInitiativesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppInitiativesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AppDashboardRoute
+  '/initiatives': typeof AppInitiativesRouteWithChildren
   '/my-work': typeof AppMyWorkRoute
   '/portfolios': typeof AppPortfoliosRouteWithChildren
+  '/products': typeof AppProductsRouteWithChildren
+  '/releases': typeof AppReleasesRouteWithChildren
+  '/initiatives/$id': typeof AppInitiativesIdRoute
   '/portfolios/$id': typeof AppPortfoliosIdRoute
+  '/products/$id': typeof AppProductsIdRoute
+  '/releases/$id': typeof AppReleasesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AppDashboardRoute
+  '/initiatives': typeof AppInitiativesRouteWithChildren
   '/my-work': typeof AppMyWorkRoute
   '/portfolios': typeof AppPortfoliosRouteWithChildren
+  '/products': typeof AppProductsRouteWithChildren
+  '/releases': typeof AppReleasesRouteWithChildren
+  '/initiatives/$id': typeof AppInitiativesIdRoute
   '/portfolios/$id': typeof AppPortfoliosIdRoute
+  '/products/$id': typeof AppProductsIdRoute
+  '/releases/$id': typeof AppReleasesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,9 +122,15 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/initiatives': typeof AppInitiativesRouteWithChildren
   '/_app/my-work': typeof AppMyWorkRoute
   '/_app/portfolios': typeof AppPortfoliosRouteWithChildren
+  '/_app/products': typeof AppProductsRouteWithChildren
+  '/_app/releases': typeof AppReleasesRouteWithChildren
+  '/_app/initiatives/$id': typeof AppInitiativesIdRoute
   '/_app/portfolios/$id': typeof AppPortfoliosIdRoute
+  '/_app/products/$id': typeof AppProductsIdRoute
+  '/_app/releases/$id': typeof AppReleasesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -84,26 +138,44 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/initiatives'
     | '/my-work'
     | '/portfolios'
+    | '/products'
+    | '/releases'
+    | '/initiatives/$id'
     | '/portfolios/$id'
+    | '/products/$id'
+    | '/releases/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/initiatives'
     | '/my-work'
     | '/portfolios'
+    | '/products'
+    | '/releases'
+    | '/initiatives/$id'
     | '/portfolios/$id'
+    | '/products/$id'
+    | '/releases/$id'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/auth'
     | '/_app/dashboard'
+    | '/_app/initiatives'
     | '/_app/my-work'
     | '/_app/portfolios'
+    | '/_app/products'
+    | '/_app/releases'
+    | '/_app/initiatives/$id'
     | '/_app/portfolios/$id'
+    | '/_app/products/$id'
+    | '/_app/releases/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -135,6 +207,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/releases': {
+      id: '/_app/releases'
+      path: '/releases'
+      fullPath: '/releases'
+      preLoaderRoute: typeof AppReleasesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/products': {
+      id: '/_app/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AppProductsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/portfolios': {
       id: '/_app/portfolios'
       path: '/portfolios'
@@ -149,12 +235,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMyWorkRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/initiatives': {
+      id: '/_app/initiatives'
+      path: '/initiatives'
+      fullPath: '/initiatives'
+      preLoaderRoute: typeof AppInitiativesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_app/releases/$id': {
+      id: '/_app/releases/$id'
+      path: '/$id'
+      fullPath: '/releases/$id'
+      preLoaderRoute: typeof AppReleasesIdRouteImport
+      parentRoute: typeof AppReleasesRoute
+    }
+    '/_app/products/$id': {
+      id: '/_app/products/$id'
+      path: '/$id'
+      fullPath: '/products/$id'
+      preLoaderRoute: typeof AppProductsIdRouteImport
+      parentRoute: typeof AppProductsRoute
     }
     '/_app/portfolios/$id': {
       id: '/_app/portfolios/$id'
@@ -163,8 +270,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPortfoliosIdRouteImport
       parentRoute: typeof AppPortfoliosRoute
     }
+    '/_app/initiatives/$id': {
+      id: '/_app/initiatives/$id'
+      path: '/$id'
+      fullPath: '/initiatives/$id'
+      preLoaderRoute: typeof AppInitiativesIdRouteImport
+      parentRoute: typeof AppInitiativesRoute
+    }
   }
 }
+
+interface AppInitiativesRouteChildren {
+  AppInitiativesIdRoute: typeof AppInitiativesIdRoute
+}
+
+const AppInitiativesRouteChildren: AppInitiativesRouteChildren = {
+  AppInitiativesIdRoute: AppInitiativesIdRoute,
+}
+
+const AppInitiativesRouteWithChildren = AppInitiativesRoute._addFileChildren(
+  AppInitiativesRouteChildren,
+)
 
 interface AppPortfoliosRouteChildren {
   AppPortfoliosIdRoute: typeof AppPortfoliosIdRoute
@@ -178,16 +304,46 @@ const AppPortfoliosRouteWithChildren = AppPortfoliosRoute._addFileChildren(
   AppPortfoliosRouteChildren,
 )
 
+interface AppProductsRouteChildren {
+  AppProductsIdRoute: typeof AppProductsIdRoute
+}
+
+const AppProductsRouteChildren: AppProductsRouteChildren = {
+  AppProductsIdRoute: AppProductsIdRoute,
+}
+
+const AppProductsRouteWithChildren = AppProductsRoute._addFileChildren(
+  AppProductsRouteChildren,
+)
+
+interface AppReleasesRouteChildren {
+  AppReleasesIdRoute: typeof AppReleasesIdRoute
+}
+
+const AppReleasesRouteChildren: AppReleasesRouteChildren = {
+  AppReleasesIdRoute: AppReleasesIdRoute,
+}
+
+const AppReleasesRouteWithChildren = AppReleasesRoute._addFileChildren(
+  AppReleasesRouteChildren,
+)
+
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
+  AppInitiativesRoute: typeof AppInitiativesRouteWithChildren
   AppMyWorkRoute: typeof AppMyWorkRoute
   AppPortfoliosRoute: typeof AppPortfoliosRouteWithChildren
+  AppProductsRoute: typeof AppProductsRouteWithChildren
+  AppReleasesRoute: typeof AppReleasesRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
+  AppInitiativesRoute: AppInitiativesRouteWithChildren,
   AppMyWorkRoute: AppMyWorkRoute,
   AppPortfoliosRoute: AppPortfoliosRouteWithChildren,
+  AppProductsRoute: AppProductsRouteWithChildren,
+  AppReleasesRoute: AppReleasesRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -200,3 +356,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
