@@ -9,38 +9,125 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppPortfoliosRouteImport } from './routes/_app.portfolios'
+import { Route as AppMyWorkRouteImport } from './routes/_app.my-work'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppPortfoliosIdRouteImport } from './routes/_app.portfolios.$id'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPortfoliosRoute = AppPortfoliosRouteImport.update({
+  id: '/portfolios',
+  path: '/portfolios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyWorkRoute = AppMyWorkRouteImport.update({
+  id: '/my-work',
+  path: '/my-work',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPortfoliosIdRoute = AppPortfoliosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppPortfoliosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/my-work': typeof AppMyWorkRoute
+  '/portfolios': typeof AppPortfoliosRouteWithChildren
+  '/portfolios/$id': typeof AppPortfoliosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/my-work': typeof AppMyWorkRoute
+  '/portfolios': typeof AppPortfoliosRouteWithChildren
+  '/portfolios/$id': typeof AppPortfoliosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/my-work': typeof AppMyWorkRoute
+  '/_app/portfolios': typeof AppPortfoliosRouteWithChildren
+  '/_app/portfolios/$id': typeof AppPortfoliosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/my-work'
+    | '/portfolios'
+    | '/portfolios/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/my-work'
+    | '/portfolios'
+    | '/portfolios/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/auth'
+    | '/_app/dashboard'
+    | '/_app/my-work'
+    | '/_app/portfolios'
+    | '/_app/portfolios/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +135,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/portfolios': {
+      id: '/_app/portfolios'
+      path: '/portfolios'
+      fullPath: '/portfolios'
+      preLoaderRoute: typeof AppPortfoliosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-work': {
+      id: '/_app/my-work'
+      path: '/my-work'
+      fullPath: '/my-work'
+      preLoaderRoute: typeof AppMyWorkRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/portfolios/$id': {
+      id: '/_app/portfolios/$id'
+      path: '/$id'
+      fullPath: '/portfolios/$id'
+      preLoaderRoute: typeof AppPortfoliosIdRouteImport
+      parentRoute: typeof AppPortfoliosRoute
+    }
   }
 }
 
+interface AppPortfoliosRouteChildren {
+  AppPortfoliosIdRoute: typeof AppPortfoliosIdRoute
+}
+
+const AppPortfoliosRouteChildren: AppPortfoliosRouteChildren = {
+  AppPortfoliosIdRoute: AppPortfoliosIdRoute,
+}
+
+const AppPortfoliosRouteWithChildren = AppPortfoliosRoute._addFileChildren(
+  AppPortfoliosRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppMyWorkRoute: typeof AppMyWorkRoute
+  AppPortfoliosRoute: typeof AppPortfoliosRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppMyWorkRoute: AppMyWorkRoute,
+  AppPortfoliosRoute: AppPortfoliosRouteWithChildren,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
