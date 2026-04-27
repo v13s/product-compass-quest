@@ -71,6 +71,39 @@ export type Database = {
         }
         Relationships: []
       }
+      dependencies: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dep_type: string
+          from_id: string
+          from_type: string
+          id: string
+          to_id: string
+          to_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dep_type?: string
+          from_id: string
+          from_type: string
+          id?: string
+          to_id: string
+          to_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dep_type?: string
+          from_id?: string
+          from_type?: string
+          id?: string
+          to_id?: string
+          to_type?: string
+        }
+        Relationships: []
+      }
       epics: {
         Row: {
           created_at: string
@@ -253,6 +286,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       portfolios: {
         Row: {
