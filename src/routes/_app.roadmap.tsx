@@ -1,14 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import {
   addDays, addMonths, addQuarters, addYears, differenceInDays, format,
   startOfWeek, startOfMonth, startOfQuarter, startOfYear, endOfWeek, endOfMonth, endOfQuarter, endOfYear,
 } from "date-fns";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
+import { detectShift, fmtDelta } from "@/lib/timeline";
 
 export const Route = createFileRoute("/_app/roadmap")({
   component: RoadmapPage,
@@ -19,6 +22,8 @@ type Granularity = "week" | "month" | "quarter" | "year";
 function RoadmapPage() {
   const [granularity, setGranularity] = useState<Granularity>("quarter");
   const [productFilter, setProductFilter] = useState<string>("all");
+  const { canEdit } = useAuth();
+  const qc = useQueryClient();
 
   const products = useQuery({
     queryKey: ["roadmap", "products"],
@@ -77,7 +82,18 @@ function RoadmapPage() {
 
   const filteredProducts = (products.data ?? []).filter((p) => productFilter === "all" || p.id === productFilter);
 
-  function bandsForProduct(productId: string) {
+  type Band = {
+    id: string;
+    kind: "epic" | "initiative";
+    rawId: string;
+    link: string;
+    label: string;
+    start: string | null;
+    end: string | null;
+    color: string;
+  };
+
+  function bandsForProduct(productId: string): Band[] {
     const productEpics = (epics.data ?? []).filter((e) => e.product_id === productId);
     const productInits = (initiatives.data ?? []).filter((i) =>
       (i.initiative_products as { product_id: string }[] | null)?.some((ip) => ip.product_id === productId),
@@ -85,6 +101,8 @@ function RoadmapPage() {
     return [
       ...productInits.map((i) => ({
         id: `i-${i.id}`,
+        kind: "initiative" as const,
+        rawId: i.id,
         link: `/initiatives/${i.id}`,
         label: i.name,
         start: i.start_date ?? i.target_date,
@@ -93,6 +111,8 @@ function RoadmapPage() {
       })),
       ...productEpics.map((e) => ({
         id: `e-${e.id}`,
+        kind: "epic" as const,
+        rawId: e.id,
         link: `/epics/${e.id}`,
         label: e.name,
         start: e.start_date ?? e.target_date,
@@ -102,11 +122,90 @@ function RoadmapPage() {
     ];
   }
 
+  // ---- Drag state ----
+  const dragRef = useRef<{
+    band: Band;
+    laneEl: HTMLDivElement;
+    laneWidth: number;
+    startX: number;
+    spanDays: number;
+    origStart: Date;
+    origEnd: Date;
+  } | null>(null);
+  const [dragPreview, setDragPreview] = useState<{ id: string; left: number; width: number } | null>(null);
+
+  function onBandPointerDown(e: React.PointerEvent, band: Band, laneEl: HTMLDivElement) {
+    if (!canEdit || !band.start || !band.end) return;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    e.preventDefault();
+    const origStart = new Date(band.start);
+    const origEnd = new Date(band.end);
+    dragRef.current = {
+      band,
+      laneEl,
+      laneWidth: laneEl.getBoundingClientRect().width,
+      startX: e.clientX,
+      spanDays: Math.max(1, differenceInDays(origEnd, origStart)),
+      origStart,
+      origEnd,
+    };
+  }
+  function onBandPointerMove(e: React.PointerEvent) {
+    const d = dragRef.current;
+    if (!d) return;
+    const dxPx = e.clientX - d.startX;
+    const dxDays = Math.round((dxPx / d.laneWidth) * totalDays);
+    const newStart = addDays(d.origStart, dxDays);
+    const left = clampPct(pct(newStart));
+    const right = clampPct(pct(addDays(newStart, d.spanDays)));
+    setDragPreview({ id: d.band.id, left, width: Math.max(1.5, right - left) });
+  }
+  async function onBandPointerUp(e: React.PointerEvent) {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (!d) return;
+    const dxPx = e.clientX - d.startX;
+    const dxDays = Math.round((dxPx / d.laneWidth) * totalDays);
+    setDragPreview(null);
+    if (dxDays === 0) return;
+
+    const newStart = addDays(d.origStart, dxDays);
+    const newEnd = addDays(d.origEnd, dxDays);
+    const newStartStr = format(newStart, "yyyy-MM-dd");
+    const newEndStr = format(newEnd, "yyyy-MM-dd");
+
+    const table = d.band.kind === "epic" ? "epics" : "initiatives";
+    const { error } = await supabase
+      .from(table)
+      .update({ start_date: newStartStr, target_date: newEndStr })
+      .eq("id", d.band.rawId);
+
+    if (error) {
+      toast.error("Failed to reschedule", { description: error.message });
+      return;
+    }
+
+    const shift = detectShift({
+      oldStart: d.band.start,
+      oldEnd: d.band.end,
+      newStart: newStartStr,
+      newEnd: newEndStr,
+    });
+    if (shift.shifted) {
+      toast.warning("Timeline shifted", {
+        description: `${d.band.label}: start ${fmtDelta(shift.startDelta)}, end ${fmtDelta(shift.endDelta)}.`,
+      });
+    } else {
+      toast.success("Rescheduled");
+    }
+    qc.invalidateQueries({ queryKey: ["roadmap"] });
+  }
+
   return (
     <>
       <PageHeader
         title="Roadmap"
-        subtitle="Swimlanes by product. Drag-to-reschedule and timeline-shift detection coming next."
+        subtitle={canEdit ? "Drag bars to reschedule. Timeline shifts will be flagged." : "Read-only view."}
         actions={
           <div className="flex items-center gap-2">
             <Select value={productFilter} onValueChange={setProductFilter}>
@@ -133,7 +232,6 @@ function RoadmapPage() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <div className="min-w-[900px]">
-                {/* Header timeline */}
                 <div className="grid border-b" style={{ gridTemplateColumns: "200px 1fr" }}>
                   <div className="border-r bg-muted/30 px-3 py-2 text-xs font-semibold text-muted-foreground">Product</div>
                   <div className="relative h-9">
@@ -149,7 +247,6 @@ function RoadmapPage() {
                   </div>
                 </div>
 
-                {/* Lanes */}
                 {filteredProducts.length === 0 && (
                   <div className="p-8 text-center text-sm text-muted-foreground">
                     No products yet. Create a product to start your roadmap.
@@ -166,12 +263,17 @@ function RoadmapPage() {
                           {bands.length} item{bands.length === 1 ? "" : "s"}
                         </div>
                       </div>
-                      <div className="relative" style={{ minHeight: Math.max(60, bands.length * 28 + 16) }}>
-                        {/* Release markers */}
+                      <div
+                        className="relative"
+                        style={{ minHeight: Math.max(60, bands.length * 28 + 16) }}
+                        ref={(el) => {
+                          if (el) (el as HTMLDivElement).dataset.lane = p.id;
+                        }}
+                      >
                         {productReleases.map((r) => (
                           <div
                             key={r.id}
-                            className="absolute top-0 bottom-0 w-px bg-primary/60"
+                            className="pointer-events-none absolute top-0 bottom-0 w-px bg-primary/60"
                             style={{ left: `${clampPct(pct(new Date(r.target_date!)))}%` }}
                             title={r.name}
                           >
@@ -180,7 +282,6 @@ function RoadmapPage() {
                             </span>
                           </div>
                         ))}
-                        {/* Bands */}
                         {bands.map((b, idx) => {
                           if (!b.start && !b.end) return null;
                           const start = b.start ? new Date(b.start) : new Date(b.end!);
@@ -188,26 +289,39 @@ function RoadmapPage() {
                           const left = clampPct(pct(start));
                           const right = clampPct(pct(end));
                           const width = Math.max(1.5, right - left);
+                          const preview = dragPreview?.id === b.id ? dragPreview : null;
                           return (
-                            <Link
+                            <div
                               key={b.id}
-                              to={b.link}
-                              className="absolute rounded-md border px-2 text-[11px] font-medium text-white shadow-sm transition-transform hover:scale-[1.01]"
+                              className="absolute"
                               style={{
-                                left: `${left}%`,
-                                width: `${width}%`,
+                                left: `${preview ? preview.left : left}%`,
+                                width: `${preview ? preview.width : width}%`,
                                 top: 8 + idx * 28,
                                 height: 22,
-                                backgroundColor: b.color,
-                                lineHeight: "22px",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                textOverflow: "ellipsis",
                               }}
-                              title={b.label}
                             >
-                              {b.label}
-                            </Link>
+                              <div
+                                role="button"
+                                onPointerDown={(e) => {
+                                  const lane = (e.currentTarget.parentElement?.parentElement) as HTMLDivElement;
+                                  if (lane) onBandPointerDown(e, b, lane);
+                                }}
+                                onPointerMove={onBandPointerMove}
+                                onPointerUp={onBandPointerUp}
+                                className={`flex h-full items-center rounded-md border px-2 text-[11px] font-medium text-white shadow-sm transition-transform hover:scale-[1.01] ${canEdit && b.start && b.end ? "cursor-grab active:cursor-grabbing" : ""}`}
+                                style={{ backgroundColor: b.color, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+                                title={b.label}
+                              >
+                                <Link
+                                  to={b.link}
+                                  onPointerDown={(e) => e.stopPropagation()}
+                                  className="block w-full truncate text-white"
+                                >
+                                  {b.label}
+                                </Link>
+                              </div>
+                            </div>
                           );
                         })}
                       </div>
