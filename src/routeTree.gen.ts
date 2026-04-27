@@ -20,8 +20,11 @@ import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppProductsRouteImport } from './routes/_app.products'
 import { Route as AppPortfoliosRouteImport } from './routes/_app.portfolios'
 import { Route as AppMyWorkRouteImport } from './routes/_app.my-work'
+import { Route as AppKanbanRouteImport } from './routes/_app.kanban'
 import { Route as AppInitiativesRouteImport } from './routes/_app.initiatives'
+import { Route as AppGanttRouteImport } from './routes/_app.gantt'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCalendarRouteImport } from './routes/_app.calendar'
 import { Route as AppStoriesIdRouteImport } from './routes/_app.stories.$id'
 import { Route as AppReleasesIdRouteImport } from './routes/_app.releases.$id'
 import { Route as AppProductsIdRouteImport } from './routes/_app.products.$id'
@@ -83,14 +86,29 @@ const AppMyWorkRoute = AppMyWorkRouteImport.update({
   path: '/my-work',
   getParentRoute: () => AppRoute,
 } as any)
+const AppKanbanRoute = AppKanbanRouteImport.update({
+  id: '/kanban',
+  path: '/kanban',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInitiativesRoute = AppInitiativesRouteImport.update({
   id: '/initiatives',
   path: '/initiatives',
   getParentRoute: () => AppRoute,
 } as any)
+const AppGanttRoute = AppGanttRouteImport.update({
+  id: '/gantt',
+  path: '/gantt',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalendarRoute = AppCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
   getParentRoute: () => AppRoute,
 } as any)
 const AppStoriesIdRoute = AppStoriesIdRouteImport.update({
@@ -127,8 +145,11 @@ const AppEpicsIdRoute = AppEpicsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/calendar': typeof AppCalendarRoute
   '/dashboard': typeof AppDashboardRoute
+  '/gantt': typeof AppGanttRoute
   '/initiatives': typeof AppInitiativesRouteWithChildren
+  '/kanban': typeof AppKanbanRoute
   '/my-work': typeof AppMyWorkRoute
   '/portfolios': typeof AppPortfoliosRouteWithChildren
   '/products': typeof AppProductsRouteWithChildren
@@ -147,8 +168,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/calendar': typeof AppCalendarRoute
   '/dashboard': typeof AppDashboardRoute
+  '/gantt': typeof AppGanttRoute
   '/initiatives': typeof AppInitiativesRouteWithChildren
+  '/kanban': typeof AppKanbanRoute
   '/my-work': typeof AppMyWorkRoute
   '/portfolios': typeof AppPortfoliosRouteWithChildren
   '/products': typeof AppProductsRouteWithChildren
@@ -169,8 +193,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_app/calendar': typeof AppCalendarRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/gantt': typeof AppGanttRoute
   '/_app/initiatives': typeof AppInitiativesRouteWithChildren
+  '/_app/kanban': typeof AppKanbanRoute
   '/_app/my-work': typeof AppMyWorkRoute
   '/_app/portfolios': typeof AppPortfoliosRouteWithChildren
   '/_app/products': typeof AppProductsRouteWithChildren
@@ -191,8 +218,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/calendar'
     | '/dashboard'
+    | '/gantt'
     | '/initiatives'
+    | '/kanban'
     | '/my-work'
     | '/portfolios'
     | '/products'
@@ -211,8 +241,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/calendar'
     | '/dashboard'
+    | '/gantt'
     | '/initiatives'
+    | '/kanban'
     | '/my-work'
     | '/portfolios'
     | '/products'
@@ -232,8 +265,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/auth'
+    | '/_app/calendar'
     | '/_app/dashboard'
+    | '/_app/gantt'
     | '/_app/initiatives'
+    | '/_app/kanban'
     | '/_app/my-work'
     | '/_app/portfolios'
     | '/_app/products'
@@ -335,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMyWorkRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/kanban': {
+      id: '/_app/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof AppKanbanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/initiatives': {
       id: '/_app/initiatives'
       path: '/initiatives'
@@ -342,11 +385,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInitiativesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/gantt': {
+      id: '/_app/gantt'
+      path: '/gantt'
+      fullPath: '/gantt'
+      preLoaderRoute: typeof AppGanttRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/calendar': {
+      id: '/_app/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AppCalendarRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/stories/$id': {
@@ -443,8 +500,11 @@ const AppReleasesRouteWithChildren = AppReleasesRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppCalendarRoute: typeof AppCalendarRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppGanttRoute: typeof AppGanttRoute
   AppInitiativesRoute: typeof AppInitiativesRouteWithChildren
+  AppKanbanRoute: typeof AppKanbanRoute
   AppMyWorkRoute: typeof AppMyWorkRoute
   AppPortfoliosRoute: typeof AppPortfoliosRouteWithChildren
   AppProductsRoute: typeof AppProductsRouteWithChildren
@@ -458,8 +518,11 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCalendarRoute: AppCalendarRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppGanttRoute: AppGanttRoute,
   AppInitiativesRoute: AppInitiativesRouteWithChildren,
+  AppKanbanRoute: AppKanbanRoute,
   AppMyWorkRoute: AppMyWorkRoute,
   AppPortfoliosRoute: AppPortfoliosRouteWithChildren,
   AppProductsRoute: AppProductsRouteWithChildren,

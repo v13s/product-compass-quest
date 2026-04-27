@@ -11,7 +11,11 @@ import {
   Settings,
   LogOut,
   User as UserIcon,
+  Columns3,
+  CalendarDays,
+  GanttChart,
 } from "lucide-react";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,6 +31,9 @@ const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/my-work", label: "My Work", icon: ListTodo },
   { to: "/roadmap", label: "Roadmap", icon: Map },
+  { to: "/kanban", label: "Kanban", icon: Columns3 },
+  { to: "/calendar", label: "Calendar", icon: CalendarDays },
+  { to: "/gantt", label: "Gantt", icon: GanttChart },
   { to: "/portfolios", label: "Portfolios", icon: Briefcase },
   { to: "/products", label: "Products", icon: Box },
   { to: "/initiatives", label: "Initiatives", icon: Lightbulb },
