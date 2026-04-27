@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { notifyMany } from "@/lib/notify";
 
 export function CommentsPanel({ entityType, entityId }: { entityType: string; entityId: string }) {
   const { user } = useAuth();
@@ -33,6 +34,27 @@ export function CommentsPanel({ entityType, entityId }: { entityType: string; en
         .from("comments")
         .insert({ entity_type: entityType, entity_id: entityId, body, author_id: user!.id });
       if (error) throw error;
+
+      // Notify owner/assignee
+      const ownerCol = entityType === "story" || entityType === "task" ? "assignee_id" : "owner_id";
+      const tableMap: Record<string, string> = {
+        epic: "epics", story: "stories", task: "tasks", initiative: "initiatives",
+        product: "products", portfolio: "portfolios",
+      };
+      const table = tableMap[entityType];
+      if (table) {
+        const { data: row } = await supabase.from(table).select(`name, ${ownerCol}`).eq("id", entityId).single();
+        const recipient = (row as Record<string, string | null> | null)?.[ownerCol];
+        if (recipient && recipient !== user!.id) {
+          await notifyMany([recipient], {
+            title: "New comment",
+            body: `${(row as { name: string }).name}: ${body.slice(0, 80)}`,
+            link: linkFor(entityType, entityId),
+            entity_type: entityType,
+            entity_id: entityId,
+          });
+        }
+      }
     },
     onSuccess: () => {
       setBody("");
@@ -40,6 +62,15 @@ export function CommentsPanel({ entityType, entityId }: { entityType: string; en
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function linkFor(t: string, id: string) {
+    if (t === "epic") return `/epics/${id}`;
+    if (t === "story") return `/stories/${id}`;
+    if (t === "initiative") return `/initiatives/${id}`;
+    if (t === "product") return `/products/${id}`;
+    if (t === "portfolio") return `/portfolios/${id}`;
+    return "/my-work";
+  }
 
   return (
     <Card>
