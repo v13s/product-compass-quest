@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { CommentsPanel } from "@/components/CommentsPanel";
+import { DependenciesPanel } from "@/components/DependenciesPanel";
 
 export const Route = createFileRoute("/_app/stories/$id")({
   component: StoryDetail,
@@ -66,6 +67,7 @@ function StoryDetail() {
         <Tabs defaultValue="tasks">
           <TabsList>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="dependencies">Dependencies</TabsTrigger>
             <TabsTrigger value="comments">Comments</TabsTrigger>
           </TabsList>
           <TabsContent value="tasks">
@@ -86,6 +88,9 @@ function StoryDetail() {
                 </ul>
               )}
             </CardContent></Card>
+          </TabsContent>
+          <TabsContent value="dependencies">
+            <DependenciesPanel entityType="story" entityId={id} />
           </TabsContent>
           <TabsContent value="comments">
             <CommentsPanel entityType="story" entityId={id} />

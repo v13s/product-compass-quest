@@ -11,7 +11,11 @@ import {
   Settings,
   LogOut,
   User as UserIcon,
+  Columns3,
+  CalendarDays,
+  GanttChart,
 } from "lucide-react";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,6 +31,9 @@ const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/my-work", label: "My Work", icon: ListTodo },
   { to: "/roadmap", label: "Roadmap", icon: Map },
+  { to: "/kanban", label: "Kanban", icon: Columns3 },
+  { to: "/calendar", label: "Calendar", icon: CalendarDays },
+  { to: "/gantt", label: "Gantt", icon: GanttChart },
   { to: "/portfolios", label: "Portfolios", icon: Briefcase },
   { to: "/products", label: "Products", icon: Box },
   { to: "/initiatives", label: "Initiatives", icon: Lightbulb },
@@ -46,11 +53,12 @@ export function AppSidebar() {
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
-      <div className="flex h-14 items-center gap-2 border-b px-4">
+      <div className="flex h-14 items-center gap-2 border-b px-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
           <Map className="h-4 w-4" />
         </div>
-        <div className="text-sm font-semibold tracking-tight">Roadmapr</div>
+        <div className="flex-1 text-sm font-semibold tracking-tight">Roadmapr</div>
+        <NotificationsBell />
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2">

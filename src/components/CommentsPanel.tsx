@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { notifyMany } from "@/lib/notify";
 
 export function CommentsPanel({ entityType, entityId }: { entityType: string; entityId: string }) {
   const { user } = useAuth();
@@ -33,6 +34,38 @@ export function CommentsPanel({ entityType, entityId }: { entityType: string; en
         .from("comments")
         .insert({ entity_type: entityType, entity_id: entityId, body, author_id: user!.id });
       if (error) throw error;
+
+      // Notify owner/assignee
+      let recipient: string | null = null;
+      let entityName = "";
+      if (entityType === "epic") {
+        const { data } = await supabase.from("epics").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "story") {
+        const { data } = await supabase.from("stories").select("name,assignee_id").eq("id", entityId).single();
+        recipient = data?.assignee_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "task") {
+        const { data } = await supabase.from("tasks").select("name,assignee_id").eq("id", entityId).single();
+        recipient = data?.assignee_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "initiative") {
+        const { data } = await supabase.from("initiatives").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "product") {
+        const { data } = await supabase.from("products").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "portfolio") {
+        const { data } = await supabase.from("portfolios").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      }
+      if (recipient && recipient !== user!.id) {
+        await notifyMany([recipient], {
+          title: "New comment",
+          body: `${entityName}: ${body.slice(0, 80)}`,
+          link: linkFor(entityType, entityId),
+          entity_type: entityType,
+          entity_id: entityId,
+        });
+      }
     },
     onSuccess: () => {
       setBody("");
@@ -40,6 +73,15 @@ export function CommentsPanel({ entityType, entityId }: { entityType: string; en
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function linkFor(t: string, id: string) {
+    if (t === "epic") return `/epics/${id}`;
+    if (t === "story") return `/stories/${id}`;
+    if (t === "initiative") return `/initiatives/${id}`;
+    if (t === "product") return `/products/${id}`;
+    if (t === "portfolio") return `/portfolios/${id}`;
+    return "/my-work";
+  }
 
   return (
     <Card>
