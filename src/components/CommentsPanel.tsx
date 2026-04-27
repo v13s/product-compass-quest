@@ -36,24 +36,35 @@ export function CommentsPanel({ entityType, entityId }: { entityType: string; en
       if (error) throw error;
 
       // Notify owner/assignee
-      const ownerCol = entityType === "story" || entityType === "task" ? "assignee_id" : "owner_id";
-      const tableMap: Record<string, string> = {
-        epic: "epics", story: "stories", task: "tasks", initiative: "initiatives",
-        product: "products", portfolio: "portfolios",
-      };
-      const table = tableMap[entityType];
-      if (table) {
-        const { data: row } = await supabase.from(table).select(`name, ${ownerCol}`).eq("id", entityId).single();
-        const recipient = (row as Record<string, string | null> | null)?.[ownerCol];
-        if (recipient && recipient !== user!.id) {
-          await notifyMany([recipient], {
-            title: "New comment",
-            body: `${(row as { name: string }).name}: ${body.slice(0, 80)}`,
-            link: linkFor(entityType, entityId),
-            entity_type: entityType,
-            entity_id: entityId,
-          });
-        }
+      let recipient: string | null = null;
+      let entityName = "";
+      if (entityType === "epic") {
+        const { data } = await supabase.from("epics").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "story") {
+        const { data } = await supabase.from("stories").select("name,assignee_id").eq("id", entityId).single();
+        recipient = data?.assignee_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "task") {
+        const { data } = await supabase.from("tasks").select("name,assignee_id").eq("id", entityId).single();
+        recipient = data?.assignee_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "initiative") {
+        const { data } = await supabase.from("initiatives").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "product") {
+        const { data } = await supabase.from("products").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      } else if (entityType === "portfolio") {
+        const { data } = await supabase.from("portfolios").select("name,owner_id").eq("id", entityId).single();
+        recipient = data?.owner_id ?? null; entityName = data?.name ?? "";
+      }
+      if (recipient && recipient !== user!.id) {
+        await notifyMany([recipient], {
+          title: "New comment",
+          body: `${entityName}: ${body.slice(0, 80)}`,
+          link: linkFor(entityType, entityId),
+          entity_type: entityType,
+          entity_id: entityId,
+        });
       }
     },
     onSuccess: () => {
