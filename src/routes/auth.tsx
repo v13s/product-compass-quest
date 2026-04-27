@@ -43,6 +43,14 @@ function AuthPage() {
       </div>
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
+          <div className="mb-6">
+            <h1 className="text-2xl font-semibold tracking-tight">Welcome to Roadmapr</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              New here? Click <span className="font-medium text-foreground">Create account</span> or
+              use <span className="font-medium text-foreground">Continue with Google</span>. Already
+              have an account? Sign in below.
+            </p>
+          </div>
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
