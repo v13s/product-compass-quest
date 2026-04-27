@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { CommentsPanel } from "@/components/CommentsPanel";
+import { DependenciesPanel } from "@/components/DependenciesPanel";
 
 export const Route = createFileRoute("/_app/epics/$id")({
   component: EpicDetail,
@@ -74,6 +75,7 @@ function EpicDetail() {
           <TabsList>
             <TabsTrigger value="stories">Stories</TabsTrigger>
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="dependencies">Dependencies</TabsTrigger>
             <TabsTrigger value="comments">Comments</TabsTrigger>
           </TabsList>
           <TabsContent value="stories">
@@ -103,6 +105,9 @@ function EpicDetail() {
               </div>
               <p className="whitespace-pre-wrap text-sm text-muted-foreground">{epic.data.description || "No description."}</p>
             </CardContent></Card>
+          </TabsContent>
+          <TabsContent value="dependencies">
+            <DependenciesPanel entityType="epic" entityId={id} />
           </TabsContent>
           <TabsContent value="comments">
             <CommentsPanel entityType="epic" entityId={id} />
