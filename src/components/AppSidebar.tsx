@@ -53,11 +53,12 @@ export function AppSidebar() {
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
-      <div className="flex h-14 items-center gap-2 border-b px-4">
+      <div className="flex h-14 items-center gap-2 border-b px-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
           <Map className="h-4 w-4" />
         </div>
-        <div className="text-sm font-semibold tracking-tight">Roadmapr</div>
+        <div className="flex-1 text-sm font-semibold tracking-tight">Roadmapr</div>
+        <NotificationsBell />
       </div>
 
       <nav className="flex-1 overflow-y-auto p-2">
